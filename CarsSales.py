@@ -56,7 +56,7 @@ h1, h2, .stMetric, .stPlotlyChart {
 
 # --- Sidebar Filters ---
 st.sidebar.header("🔍 Filter Cars")
-with st.sidebar.expander("🔧 Select Manufacturer(s)", expanded=True):
+with st.sidebar.expander("🔧 Select Manufacturer(s)", expanded=False):
     selected_manufacturers = st.multiselect(
         "Choose from available options",
         options=df['Manufacturer'].unique(),
