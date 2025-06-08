@@ -7,7 +7,7 @@ from datetime import datetime
 # Load and clean data
 @st.cache_data
 def load_data():
-    df = pd.read_csv(r"C:\Users\User\Downloads\Triangel\CarSales.csv")
+    df = pd.read_csv(r"CarSales.csv")
     df = df.drop_duplicates()
     df = df.drop(columns=['Vehicle Type'])
     df['Model'] = df['Model'].str.replace('05-Sep', '9-5').str.replace('03-Sep', '9-3')
