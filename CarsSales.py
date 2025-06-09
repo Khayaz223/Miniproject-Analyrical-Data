@@ -99,7 +99,6 @@ with st.sidebar:
     
     with st.expander("🔧 Select Manufacturer(s)", expanded=False):
         selected_manufacturers = st.multiselect(
-            background_color="#8B4000",
             options=df['Manufacturer'].unique(),
             default=df['Manufacturer'].unique()
         )
