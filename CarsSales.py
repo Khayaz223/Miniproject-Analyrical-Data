@@ -452,11 +452,3 @@ if st.checkbox("Show Cleaned Data Table"):
         }),
         use_container_width=True
     )
-
-# Downloadable Prepared Data
-st.download_button(
-    label="📥 Download Prepared Data CSV",
-    data=filtered_df.to_csv(index=False).encode('utf-8'),
-    file_name='prepared_car_sales_data.csv',
-    mime='text/csv'
-)
