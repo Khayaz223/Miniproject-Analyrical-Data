@@ -72,6 +72,9 @@ st.markdown(
     }
     .st-bb, .st-at, .st-ae, .st-af, .st-ag, .st-ah, .st-ai, .st-aj, .st-ak, .st-al, .st-am, .st-an, .st-ao, .st-ap, .st-aq, .st-ar, .st-as {
         background-color: #FFFFFF;
+        color: #000000;
+        border-radius: 10px;
+        padding: 10px;
     }
     .stMetric {
         background-color: #8B4000;
