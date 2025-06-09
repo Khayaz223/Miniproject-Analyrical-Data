@@ -130,7 +130,7 @@ with st.sidebar:
         start_date = st.date_input("Start date", min_date)
         end_date = st.date_input("End date", max_date)
 
-    st.image("KYZ.png", use_column_width=True)  # Insert your image
+    st.image("KYZ.png", use_container_width=True)  # Insert your image
 
     st.markdown("---")
     st.markdown(
