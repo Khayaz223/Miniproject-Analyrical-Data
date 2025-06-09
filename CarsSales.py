@@ -172,11 +172,29 @@ with col3:
 # --- 1. YTD Cars Sold by Manufacturer ---
 st.header("1. YTD Cars Sold by Manufacturer")
 sales_by_manu = filtered_df.groupby('Manufacturer')['Sales (Units)'].sum().sort_values(ascending=False).reset_index()
-fig1 = px.bar(sales_by_manu, x='Manufacturer', y='Sales (Units)', 
+fig1 = px.bar(sales_by_manu, 
+              x='Manufacturer', 
+              y='Sales (Units)', 
               title='Sales by Manufacturer', 
               labels={'Sales (Units)': 'Sales (Units)'},
-              text=[f"{x:,.0f}" for x in sales_by_manu['Sales (Units)']])
-fig1.update_traces(textposition='outside')
+              text=[f"{x:,.0f}" for x in sales_by_manu['Sales (Units)']],
+              color='Manufacturer',  # Add color by manufacturer
+              color_discrete_sequence=px.colors.qualitative.Vivid)  # Use a vibrant color palette
+
+# Customize the appearance
+fig1.update_traces(
+    textposition='outside',
+    marker_line_color='rgb(8,48,107)',
+    marker_line_width=1.5,
+    opacity=0.9
+)
+fig1.update_layout(
+    plot_bgcolor='rgba(0,0,0,0)',
+    paper_bgcolor='rgba(0,0,0,0)',
+    xaxis_title='Manufacturer',
+    yaxis_title='Sales (Units)',
+    showlegend=False
+)
 st.plotly_chart(fig1, use_container_width=True)
 
 # --- Downloadable Data ---
@@ -237,11 +255,32 @@ if 'Latest Launch' in df.columns:
         weekly_df['Launch Week'] = weekly_df['Latest Launch'].dt.to_period('W').astype(str)
         weekly_sales = weekly_df.groupby('Launch Week')['Sales (Units)'].sum().reset_index()
         
-        fig4 = px.line(weekly_sales, x='Launch Week', y='Sales (Units)', 
+        fig4 = px.line(weekly_sales, 
+                      x='Launch Week', 
+                      y='Sales (Units)', 
                       title=f'Weekly Sales Trend ({start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")})', 
                       markers=True,
-                      labels={'Sales (Units)': 'Sales (Units)'})
-        fig4.update_traces(text=[f"{x:,.0f}" for x in weekly_sales['Sales (Units)']])
+                      labels={'Sales (Units)': 'Sales (Units)'},
+                      color_discrete_sequence=['#FFA15A'],  # Orange line
+                      template='plotly_dark')  # Dark theme for contrast
+        
+        # Add colorful markers and styling
+        fig4.update_traces(
+            line=dict(width=3, color='#FFA15A'),
+            marker=dict(
+                size=10,
+                color='#00CC96',  # Teal markers
+                line=dict(width=2, color='DarkSlateGrey')
+            ),
+            text=[f"{x:,.0f}" for x in weekly_sales['Sales (Units)']]
+        )
+        fig4.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)'),
+            yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)'),
+            hovermode='x unified'
+        )
         st.plotly_chart(fig4, use_container_width=True)
 
         # Downloadable Data
@@ -275,9 +314,33 @@ if dimension_metric:
         y='Sales (Units)',
         title=f'Sales by {dimension_metric}',
         text=[f"{x:,.0f}" for x in dim_group['Sales (Units)']],
-        labels={'Sales (Units)': 'Sales (Units)', dimension_metric: dimension_metric}
+        labels={'Sales (Units)': 'Sales (Units)', dimension_metric: dimension_metric},
+        color='Sales (Units)',  # Color by sales value
+        color_continuous_scale=px.colors.sequential.Viridis  # Colorful gradient
     )
-    fig5.update_traces(textposition='outside')
+    
+    # Customize appearance
+    fig5.update_traces(
+        textposition='outside',
+        marker_line_color='rgb(8,48,107)',
+        marker_line_width=1.5,
+        opacity=0.8
+    )
+    fig5.update_layout(
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        coloraxis_colorbar=dict(
+            title='Sales Volume',
+            thicknessmode='pixels',
+            thickness=15,
+            lenmode='pixels',
+            len=300,
+            yanchor='top',
+            y=1,
+            xanchor='left',
+            x=1.02
+        )
+    )
     st.plotly_chart(fig5, use_container_width=True)
 
     # --- Downloadable Data ---
