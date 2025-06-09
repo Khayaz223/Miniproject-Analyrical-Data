@@ -60,6 +60,29 @@ st.markdown("""
 h1, h2, .stMetric, .stPlotlyChart {
   animation: sprinkle 1s ease-out;
 }
+
+/* Style tabs */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 10px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 50px;
+    padding: 0 20px;
+    background-color: #00008B;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid #ffffff;
+    font-weight: bold;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: #1E90FF;
+}
+
+/* Style tab content */
+[data-testid="stVerticalBlock"] {
+    gap: 0;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -107,7 +130,7 @@ with st.sidebar:
         start_date = st.date_input("Start date", min_date)
         end_date = st.date_input("End date", max_date)
 
-    st.image("KYZ.png", use_container_width=True)  # Insert your image
+    st.image("KYZ.png", use_column_width=True)  # Insert your image
 
     st.markdown("---")
     st.markdown(
@@ -163,266 +186,278 @@ with col2:
 with col3:
     st.metric("Avg Resale Ratio", f"{resale_ratio}%", "Resale/Price Ratio")
 
-# --- 1. YTD Cars Sold by Manufacturer ---
-st.header("1. YTD Cars Sold by Manufacturer")
-sales_by_manu = filtered_df.groupby('Manufacturer')['Sales (Units)'].sum().sort_values(ascending=False).reset_index()
-fig1 = px.bar(sales_by_manu, 
-              x='Manufacturer', 
-              y='Sales (Units)', 
-              title='Sales by Manufacturer', 
-              labels={'Sales (Units)': 'Sales (Units)'},
-              text=[f"{x:,.0f}" for x in sales_by_manu['Sales (Units)']],
-              color='Manufacturer',  # Add color by manufacturer
-              color_discrete_sequence=px.colors.qualitative.Vivid)  # Use a vibrant color palette
+# Create tabs for different visualizations
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "📊 Sales by Manufacturer", 
+    "⚖️ Weight & Specs", 
+    "📈 Weekly Trend", 
+    "📏 Dimensions", 
+    "🌳 Manufacturer Treemap", 
+    "📋 Raw Data"
+])
 
-# Customize the appearance
-fig1.update_traces(
-    textposition='outside',
-    marker_line_color='rgb(8,48,107)',
-    marker_line_width=1.5,
-    opacity=0.9
-)
-fig1.update_layout(
-    plot_bgcolor='rgba(0,0,0,0)',
-    paper_bgcolor='rgba(0,0,0,0)',
-    xaxis_title='Manufacturer',
-    yaxis_title='Sales (Units)',
-    showlegend=False
-)
-st.plotly_chart(fig1, use_container_width=True)
+with tab1:
+    # --- 1. YTD Cars Sold by Manufacturer ---
+    st.header("YTD Cars Sold by Manufacturer")
+    sales_by_manu = filtered_df.groupby('Manufacturer')['Sales (Units)'].sum().sort_values(ascending=False).reset_index()
+    fig1 = px.bar(sales_by_manu, 
+                x='Manufacturer', 
+                y='Sales (Units)', 
+                title='Sales by Manufacturer', 
+                labels={'Sales (Units)': 'Sales (Units)'},
+                text=[f"{x:,.0f}" for x in sales_by_manu['Sales (Units)']],
+                color='Manufacturer',
+                color_discrete_sequence=px.colors.qualitative.Vivid)
 
-# --- Downloadable Data ---
-st.download_button(
-    label="📥 Download Sales by Manufacturer CSV",
-    data=sales_by_manu.to_csv(index=False).encode('utf-8'),
-    file_name='sales_by_manufacturer.csv',
-    mime='text/csv'
-)
-
-# --- 2. Side-by-Side: Curb Weight & Vehicle Specs ---
-st.header("2. YTD Total Sales by Curb Weight & Vehicle Specifications")
-col1, col2 = st.columns(2)
-
-with col1:
-    curb_bins = pd.cut(filtered_df['Curb Weight'], bins=5)
-    df_curb = filtered_df.copy()
-    df_curb['Curb Weight Bin'] = curb_bins.astype(str)
-    curb_group = df_curb.groupby('Curb Weight Bin')['Sales (Units)'].sum().reset_index()
-    fig2 = px.pie(curb_group, values='Sales (Units)', names='Curb Weight Bin',
-                  title='Sales by Curb Weight',
-                  hover_data={'Sales (Units)': ':,.0f'})
-    st.plotly_chart(fig2, use_container_width=True)
-
-# --- Downloadable Data ---
-    st.download_button(
-    label="📥 Download Curb Weight Sales CSV",
-    data=curb_group.to_csv(index=False).encode('utf-8'),
-    file_name='sales_by_curb_weight.csv',
-    mime='text/csv'
-)
-    
-with col2:
-    spec_cols = ['Horsepower', 'Engine Size', 'Fuel Capacity', 'Fuel Efficiency', 'Power Factor']
-    selected_spec = st.selectbox("Choose Vehicle Specification", spec_cols)
-    spec_bins = pd.cut(filtered_df[selected_spec], bins=5)
-    df_spec = filtered_df.copy()
-    df_spec['Spec Bin'] = spec_bins.astype(str)
-    spec_group = df_spec.groupby('Spec Bin')['Sales (Units)'].sum().reset_index()
-    fig3 = px.pie(spec_group, values='Sales (Units)', names='Spec Bin',
-                  title=f'Sales by {selected_spec}', hole=0.4,
-                  hover_data={'Sales (Units)': ':,.0f'})
-    st.plotly_chart(fig3, use_container_width=True)
-
-# --- Downloadable Data ---
-    st.download_button(
-    label=f"📥 Download Sales by {selected_spec} CSV",
-    data=spec_group.to_csv(index=False).encode('utf-8'),
-    file_name=f'sales_by_{selected_spec.lower().replace(" ", "_")}.csv',
-    mime='text/csv'
-)
-
-# --- 3. YTD Sales Weekly Trend ---
-st.header("3. YTD Sales Weekly Trend")
-if 'Latest Launch' in df.columns:
-    if not filtered_df.empty:
-        weekly_df = filtered_df.copy()
-        weekly_df['Launch Week'] = weekly_df['Latest Launch'].dt.to_period('W').astype(str)
-        weekly_sales = weekly_df.groupby('Launch Week')['Sales (Units)'].sum().reset_index()
-        
-        fig4 = px.line(weekly_sales, 
-                      x='Launch Week', 
-                      y='Sales (Units)', 
-                      title=f'Weekly Sales Trend ({start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")})', 
-                      markers=True,
-                      labels={'Sales (Units)': 'Sales (Units)'},
-                      color_discrete_sequence=['#FFA15A'],  # Orange line
-                      template='plotly_dark')  # Dark theme for contrast
-        
-        # Add colorful markers and styling
-        fig4.update_traces(
-            line=dict(width=3, color='#FFA15A'),
-            marker=dict(
-                size=10,
-                color='#00CC96',  # Teal markers
-                line=dict(width=2, color='DarkSlateGrey')
-            ),
-            text=[f"{x:,.0f}" for x in weekly_sales['Sales (Units)']]
-        )
-        fig4.update_layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)'),
-            yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)'),
-            hovermode='x unified'
-        )
-        st.plotly_chart(fig4, use_container_width=True)
-
-        # Downloadable Data
-        st.download_button(
-            label="📥 Download Weekly Sales Trend CSV",
-            data=weekly_sales.to_csv(index=False).encode('utf-8'),
-            file_name='weekly_sales_trend.csv',
-            mime='text/csv'
-        )
-    else:
-        st.warning("No data available for the selected date range.")
-else:
-    st.warning("Weekly trend requires 'Latest Launch' date data.")
-
-# --- 4. YTD Sales by Vehicle Dimensions ---
-st.header("4. YTD Total Sales by Vehicle Dimensions")
-dimension_metric = st.radio("Choose Metric", ['Wheelbase-to-Length Ratio', 'Area Proxy'])
-
-if dimension_metric:
-    dim_bins = pd.cut(filtered_df[dimension_metric], bins=5)
-    df_dim = filtered_df.copy()
-    df_dim['Dimension Bin'] = dim_bins.astype(str)
-    dim_group = df_dim.groupby('Dimension Bin').agg({
-        dimension_metric: 'mean',
-        'Sales (Units)': 'sum'
-    }).reset_index()
-
-    fig5 = px.bar(
-        dim_group,
-        x=dimension_metric,
-        y='Sales (Units)',
-        title=f'Sales by {dimension_metric}',
-        text=[f"{x:,.0f}" for x in dim_group['Sales (Units)']],
-        labels={'Sales (Units)': 'Sales (Units)', dimension_metric: dimension_metric},
-        color='Sales (Units)',  # Color by sales value
-        color_continuous_scale=px.colors.sequential.Viridis  # Colorful gradient
-    )
-    
-    # Customize appearance
-    fig5.update_traces(
+    fig1.update_traces(
         textposition='outside',
         marker_line_color='rgb(8,48,107)',
         marker_line_width=1.5,
-        opacity=0.8
+        opacity=0.9
     )
-    fig5.update_layout(
+    fig1.update_layout(
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        coloraxis_colorbar=dict(
-            title='Sales Volume',
-            thicknessmode='pixels',
-            thickness=15,
-            lenmode='pixels',
-            len=300,
-            yanchor='top',
-            y=1,
-            xanchor='left',
-            x=1.02
-        )
+        xaxis_title='Manufacturer',
+        yaxis_title='Sales (Units)',
+        showlegend=False
     )
-    st.plotly_chart(fig5, use_container_width=True)
+    st.plotly_chart(fig1, use_container_width=True)
 
     # --- Downloadable Data ---
     st.download_button(
-        label=f"📥 Download Sales by {dimension_metric} CSV",
-        data=dim_group.to_csv(index=False).encode('utf-8'),
-        file_name=f'sales_by_{dimension_metric.lower().replace(" ", "_").replace("-", "_")}.csv',
+        label="📥 Download Sales by Manufacturer CSV",
+        data=sales_by_manu.to_csv(index=False).encode('utf-8'),
+        file_name='sales_by_manufacturer.csv',
         mime='text/csv'
     )
 
-# --- 5. Company-Wise Sales Trend (Treemap with Visible Values) ---
-st.header("5. Company-Wise Sales Trend")
+with tab2:
+    # --- 2. Side-by-Side: Curb Weight & Vehicle Specs ---
+    st.header("YTD Total Sales by Curb Weight & Vehicle Specifications")
+    col1, col2 = st.columns(2)
 
-# Use unscaled values for visualization (as per your request)
-filtered_df['Sales Display'] = filtered_df['Sales (Units)']
-filtered_df['Price Display'] = filtered_df['Price']
-filtered_df['Resale Display'] = filtered_df['Year Resale Value']
+    with col1:
+        curb_bins = pd.cut(filtered_df['Curb Weight'], bins=5)
+        df_curb = filtered_df.copy()
+        df_curb['Curb Weight Bin'] = curb_bins.astype(str)
+        curb_group = df_curb.groupby('Curb Weight Bin')['Sales (Units)'].sum().reset_index()
+        fig2 = px.pie(curb_group, values='Sales (Units)', names='Curb Weight Bin',
+                    title='Sales by Curb Weight',
+                    hover_data={'Sales (Units)': ':,.0f'})
+        st.plotly_chart(fig2, use_container_width=True)
 
-treemap_df = filtered_df.groupby(['Manufacturer', 'Model']).agg({
-    'Sales Display': 'sum',
-    'Price Display': 'mean',
-    'Resale Display': 'mean'
-}).reset_index()
+    # --- Downloadable Data ---
+        st.download_button(
+        label="📥 Download Curb Weight Sales CSV",
+        data=curb_group.to_csv(index=False).encode('utf-8'),
+        file_name='sales_by_curb_weight.csv',
+        mime='text/csv'
+    )
+        
+    with col2:
+        spec_cols = ['Horsepower', 'Engine Size', 'Fuel Capacity', 'Fuel Efficiency', 'Power Factor']
+        selected_spec = st.selectbox("Choose Vehicle Specification", spec_cols)
+        spec_bins = pd.cut(filtered_df[selected_spec], bins=5)
+        df_spec = filtered_df.copy()
+        df_spec['Spec Bin'] = spec_bins.astype(str)
+        spec_group = df_spec.groupby('Spec Bin')['Sales (Units)'].sum().reset_index()
+        fig3 = px.pie(spec_group, values='Sales (Units)', names='Spec Bin',
+                    title=f'Sales by {selected_spec}', hole=0.4,
+                    hover_data={'Sales (Units)': ':,.0f'})
+        st.plotly_chart(fig3, use_container_width=True)
 
-fig6 = px.treemap(
-    treemap_df,
-    path=['Manufacturer', 'Model'],
-    values='Sales Display',
-    color='Price Display',
-    color_continuous_scale=px.colors.sequential.Rainbow,
-    hover_data={
-        'Sales Display': ':.0f',
-        'Price Display': ':.0f',
-        'Resale Display': ':.0f'
-    },
-    title="Sales Treemap by Manufacturer and Model (Sized by Sales in Thousands, Colored by Price in Thousands)"
-)
-
-fig6.update_traces(
-    hovertemplate='<b>%{label}</b><br>Sales: %{customdata[0]:,.0f}<br>Price: $%{customdata[1]:,.0f}<br>Resale: $%{customdata[2]:,.0f}<extra></extra>',
-    texttemplate='%{label}<br>%{value:,.0f} Units',
-    textfont=dict(size=14),
-    textposition="middle center"
-)
-
-st.plotly_chart(fig6, use_container_width=True)
-
-# Downloadable Data
-st.download_button(
-    label="📥 Download Treemap Sales Data CSV",
-    data=treemap_df.to_csv(index=False).encode('utf-8'),
-    file_name='sales_treemap_data.csv',
-    mime='text/csv'
-)
-
-# --- 6. Prepared Dataset Table ---
-st.header("6. Prepared Dataset")
-if st.checkbox("Show Prepared Data Table"):
-    st.dataframe(
-        filtered_df.style.format({
-            'Sales in Thousands': '{:,.3f}',
-            'Sales Display': '{:,.0f}',
-            'Engine Size': '{:,.1f}',
-            'Fuel Capacity': '{:,.1f}',
-            'Fuel Efficiency': '{:,.0f}',
-            'Wheelbase': '{:,.1f}',
-            'Length': '{:,.1f}',
-            'Width': '{:,.1f}',
-            'Latest Launch': lambda x: x.strftime('%Y-%m-%d') if isinstance(x, pd.Timestamp) else x,
-            'Price in Thousands': '${:,.1f}',
-            'Horsepower': '{:,.0f}',
-            'Sales (Units)': '{:,.0f}',
-            'Price': '${:,.0f}',
-            'Year Resale Value': '${:,.0f}',
-            'Price Display': '${:,.0f}',
-            'Resale Display': '${:,.0f}',
-            'Curb Weight': '{:.1f}',
-            'Power Factor': '{:.1f}',
-            'Wheelbase-to-Length Ratio': '{:.3f}',
-            'Area Proxy': '{:.1f}'
-        }),
-        use_container_width=True
+    # --- Downloadable Data ---
+        st.download_button(
+        label=f"📥 Download Sales by {selected_spec} CSV",
+        data=spec_group.to_csv(index=False).encode('utf-8'),
+        file_name=f'sales_by_{selected_spec.lower().replace(" ", "_")}.csv',
+        mime='text/csv'
     )
 
-# Downloadable Prepared Data
-st.download_button(
-    label="📥 Download Prepared Data CSV",
-    data=filtered_df.to_csv(index=False).encode('utf-8'),
-    file_name='prepared_car_sales_data.csv',
-    mime='text/csv'
-)
+with tab3:
+    # --- 3. YTD Sales Weekly Trend ---
+    st.header("YTD Sales Weekly Trend")
+    if 'Latest Launch' in df.columns:
+        if not filtered_df.empty:
+            weekly_df = filtered_df.copy()
+            weekly_df['Launch Week'] = weekly_df['Latest Launch'].dt.to_period('W').astype(str)
+            weekly_sales = weekly_df.groupby('Launch Week')['Sales (Units)'].sum().reset_index()
+            
+            fig4 = px.line(weekly_sales, 
+                          x='Launch Week', 
+                          y='Sales (Units)', 
+                          title=f'Weekly Sales Trend ({start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")})', 
+                          markers=True,
+                          labels={'Sales (Units)': 'Sales (Units)'},
+                          color_discrete_sequence=['#FFA15A'],
+                          template='plotly_dark')
+            
+            fig4.update_traces(
+                line=dict(width=3, color='#FFA15A'),
+                marker=dict(
+                    size=10,
+                    color='#00CC96',
+                    line=dict(width=2, color='DarkSlateGrey')
+                ),
+                text=[f"{x:,.0f}" for x in weekly_sales['Sales (Units)']]
+            )
+            fig4.update_layout(
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)'),
+                yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)'),
+                hovermode='x unified'
+            )
+            st.plotly_chart(fig4, use_container_width=True)
+
+            # Downloadable Data
+            st.download_button(
+                label="📥 Download Weekly Sales Trend CSV",
+                data=weekly_sales.to_csv(index=False).encode('utf-8'),
+                file_name='weekly_sales_trend.csv',
+                mime='text/csv'
+            )
+        else:
+            st.warning("No data available for the selected date range.")
+    else:
+        st.warning("Weekly trend requires 'Latest Launch' date data.")
+
+with tab4:
+    # --- 4. YTD Sales by Vehicle Dimensions ---
+    st.header("YTD Total Sales by Vehicle Dimensions")
+    dimension_metric = st.radio("Choose Metric", ['Wheelbase-to-Length Ratio', 'Area Proxy'])
+
+    if dimension_metric:
+        dim_bins = pd.cut(filtered_df[dimension_metric], bins=5)
+        df_dim = filtered_df.copy()
+        df_dim['Dimension Bin'] = dim_bins.astype(str)
+        dim_group = df_dim.groupby('Dimension Bin').agg({
+            dimension_metric: 'mean',
+            'Sales (Units)': 'sum'
+        }).reset_index()
+
+        fig5 = px.bar(
+            dim_group,
+            x=dimension_metric,
+            y='Sales (Units)',
+            title=f'Sales by {dimension_metric}',
+            text=[f"{x:,.0f}" for x in dim_group['Sales (Units)']],
+            labels={'Sales (Units)': 'Sales (Units)', dimension_metric: dimension_metric},
+            color='Sales (Units)',
+            color_continuous_scale=px.colors.sequential.Viridis
+        )
+        
+        fig5.update_traces(
+            textposition='outside',
+            marker_line_color='rgb(8,48,107)',
+            marker_line_width=1.5,
+            opacity=0.8
+        )
+        fig5.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            coloraxis_colorbar=dict(
+                title='Sales Volume',
+                thicknessmode='pixels',
+                thickness=15,
+                lenmode='pixels',
+                len=300,
+                yanchor='top',
+                y=1,
+                xanchor='left',
+                x=1.02
+            )
+        )
+        st.plotly_chart(fig5, use_container_width=True)
+
+        # --- Downloadable Data ---
+        st.download_button(
+            label=f"📥 Download Sales by {dimension_metric} CSV",
+            data=dim_group.to_csv(index=False).encode('utf-8'),
+            file_name=f'sales_by_{dimension_metric.lower().replace(" ", "_").replace("-", "_")}.csv',
+            mime='text/csv'
+        )
+
+with tab5:
+    # --- 5. Company-Wise Sales Trend (Treemap with Visible Values) ---
+    st.header("Company-Wise Sales Trend")
+
+    filtered_df['Sales Display'] = filtered_df['Sales (Units)']
+    filtered_df['Price Display'] = filtered_df['Price']
+    filtered_df['Resale Display'] = filtered_df['Year Resale Value']
+
+    treemap_df = filtered_df.groupby(['Manufacturer', 'Model']).agg({
+        'Sales Display': 'sum',
+        'Price Display': 'mean',
+        'Resale Display': 'mean'
+    }).reset_index()
+
+    fig6 = px.treemap(
+        treemap_df,
+        path=['Manufacturer', 'Model'],
+        values='Sales Display',
+        color='Price Display',
+        color_continuous_scale=px.colors.sequential.Rainbow,
+        hover_data={
+            'Sales Display': ':.0f',
+            'Price Display': ':.0f',
+            'Resale Display': ':.0f'
+        },
+        title="Sales Treemap by Manufacturer and Model (Sized by Sales in Thousands, Colored by Price in Thousands)"
+    )
+
+    fig6.update_traces(
+        hovertemplate='<b>%{label}</b><br>Sales: %{customdata[0]:,.0f}<br>Price: $%{customdata[1]:,.0f}<br>Resale: $%{customdata[2]:,.0f}<extra></extra>',
+        texttemplate='%{label}<br>%{value:,.0f} Units',
+        textfont=dict(size=14),
+        textposition="middle center"
+    )
+
+    st.plotly_chart(fig6, use_container_width=True)
+
+    # Downloadable Data
+    st.download_button(
+        label="📥 Download Treemap Sales Data CSV",
+        data=treemap_df.to_csv(index=False).encode('utf-8'),
+        file_name='sales_treemap_data.csv',
+        mime='text/csv'
+    )
+
+with tab6:
+    # --- 6. Prepared Dataset Table ---
+    st.header("Prepared Dataset")
+    if st.checkbox("Show Prepared Data Table"):
+        st.dataframe(
+            filtered_df.style.format({
+                'Sales in Thousands': '{:,.3f}',
+                'Sales Display': '{:,.0f}',
+                'Engine Size': '{:,.1f}',
+                'Fuel Capacity': '{:,.1f}',
+                'Fuel Efficiency': '{:,.0f}',
+                'Wheelbase': '{:,.1f}',
+                'Length': '{:,.1f}',
+                'Width': '{:,.1f}',
+                'Latest Launch': lambda x: x.strftime('%Y-%m-%d') if isinstance(x, pd.Timestamp) else x,
+                'Price in Thousands': '${:,.1f}',
+                'Horsepower': '{:,.0f}',
+                'Sales (Units)': '{:,.0f}',
+                'Price': '${:,.0f}',
+                'Year Resale Value': '${:,.0f}',
+                'Price Display': '${:,.0f}',
+                'Resale Display': '${:,.0f}',
+                'Curb Weight': '{:.1f}',
+                'Power Factor': '{:.1f}',
+                'Wheelbase-to-Length Ratio': '{:.3f}',
+                'Area Proxy': '{:.1f}'
+            }),
+            use_container_width=True
+        )
+
+    # Downloadable Prepared Data
+    st.download_button(
+        label="📥 Download Prepared Data CSV",
+        data=filtered_df.to_csv(index=False).encode('utf-8'),
+        file_name='prepared_car_sales_data.csv',
+        mime='text/csv'
+    )
