@@ -45,7 +45,6 @@ st.markdown("""
 <style>
  /* Adjust sidebar styling */
 [data-testid="stSidebar"] {
-    background-color: #8B0000;
     padding: 1rem;
 }
 
