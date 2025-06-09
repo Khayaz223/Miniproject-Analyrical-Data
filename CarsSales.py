@@ -66,7 +66,7 @@ h1, h2, .stMetric, .stPlotlyChart {
 
 # --- Sidebar Filters ---
 with st.sidebar:
-    st.image("KYZ.png", use_column_width=True)  # Insert your image
+    st.image("KYZ.png", use_container_width=True)  # Insert your image
 
     st.markdown("### 🔍 Filter Cars")
     
