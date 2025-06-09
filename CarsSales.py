@@ -78,7 +78,7 @@ body {
 st.sidebar.header("🔍 Filter Cars")
 
 with st.sidebar:
-    st.image("cars.jpg", use_column_width=True)  # Insert your image
+    st.image("KYZ.jpg", use_column_width=True)  # Insert your image
 
     st.markdown("### 🔍 Filter Cars")
 
