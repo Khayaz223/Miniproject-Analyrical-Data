@@ -425,8 +425,8 @@ with tab5:
     )
 
 # --- 6. Prepared Dataset Table ---
-st.header("6. Prepared Dataset")
-if st.checkbox("Show Prepared Data Table"):
+st.header("Cleaned Data")
+if st.checkbox("Show Cleaned Data Table"):
     st.dataframe(
         filtered_df.style.format({
             'Sales in Thousands': '{:,.3f}',
