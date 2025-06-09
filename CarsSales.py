@@ -4,29 +4,6 @@ import numpy as np
 import plotly.express as px
 from datetime import datetime
 
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-color: #1a1a1a;
-        color: #ffffff;
-    }
-    .st-bb, .st-at, .st-ae, .st-af, .st-ag, .st-ah, .st-ai, .st-aj, .st-ak, .st-al, .st-am, .st-an, .st-ao, .st-ap, .st-aq, .st-ar, .st-as {
-        background-color: #2d2d2d;
-    }
-    .stMetric {
-        background-color: #333333;
-        border-radius: 10px;
-        padding: 10px;
-    }
-    .css-1aumxhk {
-        background-color: #333333;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Load and clean data
 @st.cache_data
 def load_data():
@@ -85,6 +62,29 @@ h1, h2, .stMetric, .stPlotlyChart {
 }
 </style>
 """, unsafe_allow_html=True)
+
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: #1a1a1a;
+        color: #ffffff;
+    }
+    .st-bb, .st-at, .st-ae, .st-af, .st-ag, .st-ah, .st-ai, .st-aj, .st-ak, .st-al, .st-am, .st-an, .st-ao, .st-ap, .st-aq, .st-ar, .st-as {
+        background-color: #2d2d2d;
+    }
+    .stMetric {
+        background-color: #333333;
+        border-radius: 10px;
+        padding: 10px;
+    }
+    .css-1aumxhk {
+        background-color: #333333;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # --- Sidebar Filters ---
 with st.sidebar:
