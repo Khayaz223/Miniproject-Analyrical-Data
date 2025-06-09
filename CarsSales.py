@@ -425,39 +425,39 @@ with tab5:
         mime='text/csv'
     )
 
-    # --- 6. Prepared Dataset Table ---
-    st.header("Prepared Dataset")
-    if st.checkbox("Show Prepared Data Table"):
-        st.dataframe(
-            filtered_df.style.format({
-                'Sales in Thousands': '{:,.3f}',
-                'Sales Display': '{:,.0f}',
-                'Engine Size': '{:,.1f}',
-                'Fuel Capacity': '{:,.1f}',
-                'Fuel Efficiency': '{:,.0f}',
-                'Wheelbase': '{:,.1f}',
-                'Length': '{:,.1f}',
-                'Width': '{:,.1f}',
-                'Latest Launch': lambda x: x.strftime('%Y-%m-%d') if isinstance(x, pd.Timestamp) else x,
-                'Price in Thousands': '${:,.1f}',
-                'Horsepower': '{:,.0f}',
-                'Sales (Units)': '{:,.0f}',
-                'Price': '${:,.0f}',
-                'Year Resale Value': '${:,.0f}',
-                'Price Display': '${:,.0f}',
-                'Resale Display': '${:,.0f}',
-                'Curb Weight': '{:.1f}',
-                'Power Factor': '{:.1f}',
-                'Wheelbase-to-Length Ratio': '{:.3f}',
-                'Area Proxy': '{:.1f}'
-            }),
-            use_container_width=True
-        )
-
-    # Downloadable Prepared Data
-    st.download_button(
-        label="📥 Download Prepared Data CSV",
-        data=filtered_df.to_csv(index=False).encode('utf-8'),
-        file_name='prepared_car_sales_data.csv',
-        mime='text/csv'
+# --- 6. Prepared Dataset Table ---
+st.header("6. Prepared Dataset")
+if st.checkbox("Show Prepared Data Table"):
+    st.dataframe(
+        filtered_df.style.format({
+            'Sales in Thousands': '{:,.3f}',
+            'Sales Display': '{:,.0f}',
+            'Engine Size': '{:,.1f}',
+            'Fuel Capacity': '{:,.1f}',
+            'Fuel Efficiency': '{:,.0f}',
+            'Wheelbase': '{:,.1f}',
+            'Length': '{:,.1f}',
+            'Width': '{:,.1f}',
+            'Latest Launch': lambda x: x.strftime('%Y-%m-%d') if isinstance(x, pd.Timestamp) else x,
+            'Price in Thousands': '${:,.1f}',
+            'Horsepower': '{:,.0f}',
+            'Sales (Units)': '{:,.0f}',
+            'Price': '${:,.0f}',
+            'Year Resale Value': '${:,.0f}',
+            'Price Display': '${:,.0f}',
+            'Resale Display': '${:,.0f}',
+            'Curb Weight': '{:.1f}',
+            'Power Factor': '{:.1f}',
+            'Wheelbase-to-Length Ratio': '{:.3f}',
+            'Area Proxy': '{:.1f}'
+        }),
+        use_container_width=True
     )
+
+# Downloadable Prepared Data
+st.download_button(
+    label="📥 Download Prepared Data CSV",
+    data=filtered_df.to_csv(index=False).encode('utf-8'),
+    file_name='prepared_car_sales_data.csv',
+    mime='text/csv'
+)
