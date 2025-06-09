@@ -115,7 +115,7 @@ body {
 # --- Sidebar Filters ---
 st.sidebar.header("🔍 Filter Cars")
 with st.sidebar:
-    st.image("KYZ.jpg", use_column_width=True)
+    st.image("KYZ.png", use_column_width=True)
     st.markdown("### 🔍 Filter Cars")
     dashboard_launch_date = st.date_input("📅 Dashboard Launch Date", datetime.now().date())
     
