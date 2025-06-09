@@ -192,8 +192,7 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "⚖️ Weight & Specs", 
     "📈 Weekly Trend", 
     "📏 Dimensions", 
-    "🌳 Manufacturer Treemap", 
-    "📋 Raw Data"
+    "🌳 Manufacturer Treemap"
 ])
 
 with tab1:
