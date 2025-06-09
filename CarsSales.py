@@ -74,7 +74,7 @@ st.markdown(
         background-color: #2d2d2d;
     }
     .stMetric {
-        background-color: #333333;
+        background-color: #8B4000;
         border-radius: 10px;
         padding: 10px;
     }
