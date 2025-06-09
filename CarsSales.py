@@ -54,13 +54,50 @@ h1, h2, .stMetric, .stPlotlyChart {
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* Set patterned background */
+body {
+    background-image: url("https://www.transparenttextures.com/patterns/diagmonds-light.png");
+    background-color: #f0f2f6;
+    background-repeat: repeat;
+}
+
+/* Adjust sidebar styling */
+[data-testid="stSidebar"] {
+    background-color: #e0e4ec;
+    padding: 1rem;
+}
+
+/* Make sidebar scrollable */
+.css-1d391kg {overflow-y: auto;}
+</style>
+""", unsafe_allow_html=True)
+
 # --- Sidebar Filters ---
 st.sidebar.header("🔍 Filter Cars")
-with st.sidebar.expander("🔧 Select Manufacturer(s)", expanded=False):
-    selected_manufacturers = st.multiselect(
-        "Choose from available options",
-        options=df['Manufacturer'].unique(),
-        default=df['Manufacturer'].unique()
+
+with st.sidebar:
+    st.image("cars.jpg", use_column_width=True)  # Insert your image
+
+    st.markdown("### 🔍 Filter Cars")
+
+    # Adjustable launch date
+    dashboard_launch_date = st.date_input("📅 Dashboard Launch Date", datetime.now().date())
+    
+    with st.expander("🔧 Select Manufacturer(s)", expanded=False):
+        selected_manufacturers = st.multiselect(
+            "Choose from available options",
+            options=df['Manufacturer'].unique(),
+            default=df['Manufacturer'].unique()
+        )
+
+    st.markdown("---")
+    st.markdown(
+        "<div style='text-align: center; font-size: 13px; color: gray;'>"
+        "© 2025, <b>Khayaz</b>"
+        "</div>",
+        unsafe_allow_html=True
     )
 
 # --- Filtered Data ---
@@ -82,7 +119,7 @@ with col_title:
     )
     st.markdown(
         f"<div style='font-size:16px; color:gray; margin-top:0;'>"
-        f"Last update: <b>{datetime.now().strftime('%Y-%m-%d')}</b> &nbsp;|&nbsp; Created by <b>Khairul Azhad bin Khairul Nizam 2410735</b>"
+        f"Dashboard Launch Date: <b>{dashboard_launch_date.strftime('%Y-%m-%d')}</b> &nbsp;|&nbsp; Created by <b>Khairul Azhad bin Khairul Nizam 2410735</b>"
         f"</div>",
         unsafe_allow_html=True
     )
