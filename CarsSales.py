@@ -76,6 +76,16 @@ with st.sidebar:
             default=df['Manufacturer'].unique()
         )
 
+    # Add date range selector to sidebar if 'Latest Launch' exists in dataframe
+    if 'Latest Launch' in df.columns:
+        st.markdown("---")
+        st.markdown("### 📅 Date Range Selector")
+        min_date = df['Latest Launch'].min()
+        max_date = df['Latest Launch'].max()
+        
+        start_date = st.date_input("Start date", min_date)
+        end_date = st.date_input("End date", max_date)
+
     st.markdown("---")
     st.markdown(
         "<div style='text-align: center; font-size: 13px; color: gray;'>"
@@ -84,9 +94,15 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-
 # --- Filtered Data ---
 filtered_df = df[df['Manufacturer'].isin(selected_manufacturers)]
+
+# Apply date filter if 'Latest Launch' exists
+if 'Latest Launch' in filtered_df.columns:
+    start_date = pd.to_datetime(start_date)
+    end_date = pd.to_datetime(end_date)
+    filtered_df = filtered_df[(filtered_df['Latest Launch'] >= start_date) & 
+                             (filtered_df['Latest Launch'] <= end_date)]
 
 # --- KPI Section ---
 from datetime import datetime
@@ -186,24 +202,28 @@ with col2:
 
 # --- 3. YTD Sales Weekly Trend ---
 st.header("3. YTD Sales Weekly Trend")
-if 'Latest Launch' in filtered_df.columns:
-    weekly_df = filtered_df.copy()
-    weekly_df['Launch Week'] = filtered_df['Latest Launch'].dt.to_period('W').astype(str)
-    weekly_sales = weekly_df.groupby('Launch Week')['Sales (Units)'].sum().reset_index()
-    fig4 = px.line(weekly_sales, x='Launch Week', y='Sales (Units)', 
-                  title='Weekly Sales Trend', markers=True,
-                  labels={'Sales (Units)': 'Sales (Units)'})
-    fig4.update_traces(text=[f"{x:,.0f}" for x in weekly_sales['Sales (Units)']])
-    st.plotly_chart(fig4, use_container_width=True)
+if 'Latest Launch' in df.columns:
+    if not filtered_df.empty:
+        weekly_df = filtered_df.copy()
+        weekly_df['Launch Week'] = weekly_df['Latest Launch'].dt.to_period('W').astype(str)
+        weekly_sales = weekly_df.groupby('Launch Week')['Sales (Units)'].sum().reset_index()
+        
+        fig4 = px.line(weekly_sales, x='Launch Week', y='Sales (Units)', 
+                      title=f'Weekly Sales Trend ({start_date.strftime("%Y-%m-%d")} to {end_date.strftime("%Y-%m-%d")})', 
+                      markers=True,
+                      labels={'Sales (Units)': 'Sales (Units)'})
+        fig4.update_traces(text=[f"{x:,.0f}" for x in weekly_sales['Sales (Units)']])
+        st.plotly_chart(fig4, use_container_width=True)
 
-    # Downloadable Data
-    st.download_button(
-    label="📥 Download Weekly Sales Trend CSV",
-    data=weekly_sales.to_csv(index=False).encode('utf-8'),
-    file_name='weekly_sales_trend.csv',
-    mime='text/csv'
-)
-
+        # Downloadable Data
+        st.download_button(
+            label="📥 Download Weekly Sales Trend CSV",
+            data=weekly_sales.to_csv(index=False).encode('utf-8'),
+            file_name='weekly_sales_trend.csv',
+            mime='text/csv'
+        )
+    else:
+        st.warning("No data available for the selected date range.")
 else:
     st.warning("Weekly trend requires 'Latest Launch' date data.")
 
