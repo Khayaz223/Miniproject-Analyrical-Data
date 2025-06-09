@@ -79,7 +79,7 @@ st.markdown(
         padding: 10px;
     }
     .css-1aumxhk {
-        background-color: #333333;
+        background-color: #8B4000;
     }
     </style>
     """,
