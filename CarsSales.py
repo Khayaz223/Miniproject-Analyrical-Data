@@ -99,6 +99,7 @@ with st.sidebar:
     
     with st.expander("🔧 Select Manufacturer(s)", expanded=False):
         selected_manufacturers = st.multiselect(
+            "Choose from available options",
             options=df['Manufacturer'].unique(),
             default=df['Manufacturer'].unique()
         )
