@@ -342,11 +342,12 @@ with tab4:
             x=dimension_metric,
             y='Sales (Units)',
             title=f'Sales by {dimension_metric}',
-            text=[f"{x:,.0f}" for x in dim_group['Sales (Units)']],
+            text='Sales (Units)',  # <- Changed this line
             labels={'Sales (Units)': 'Sales (Units)', dimension_metric: dimension_metric},
             color='Sales (Units)',
             color_continuous_scale=px.colors.sequential.Viridis
-        )
+       )
+
         
         fig5.update_traces(
             textposition='outside',
