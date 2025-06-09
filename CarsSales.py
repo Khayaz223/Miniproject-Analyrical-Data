@@ -425,7 +425,6 @@ with tab5:
         mime='text/csv'
     )
 
-with tab6:
     # --- 6. Prepared Dataset Table ---
     st.header("Prepared Dataset")
     if st.checkbox("Show Prepared Data Table"):
