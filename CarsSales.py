@@ -114,24 +114,63 @@ body {
 
 # --- Sidebar Filters ---
 st.sidebar.header("🔍 Filter Cars")
+st.sidebar.markdown("### 🌓 Theme Toggle")
+theme_mode = st.sidebar.radio("Select Theme Mode", ['Light', 'Dark'], horizontal=True)
+
+if theme_mode == "Dark":
+    st.markdown("""
+    <style>
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    .stApp {
+        background-color: #121212;
+    }
+    [data-testid="stSidebar"] {
+        background-color: #1e1e1e;
+    }
+    .stMetric, .stPlotlyChart, .stDataFrame {
+        background-color: #1e1e1e !important;
+        color: #e0e0e0 !important;
+        border-radius: 8px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown("""
+    <style>
+    body {
+        background-color: #f0f2f6;
+        color: black;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 with st.sidebar:
     st.image("KYZ.png", use_column_width=True)
     st.markdown("### 🔍 Filter Cars")
     dashboard_launch_date = st.date_input("📅 Dashboard Launch Date", datetime.now().date())
     
-    with st.expander("🔧 Select Manufacturer(s)", expanded=False):
-        selected_manufacturers = st.multiselect(
-            "Choose from available options",
-            options=df['Manufacturer'].unique(),
-            default=df['Manufacturer'].unique()
-        )
+selected_manufacturer = st.selectbox(
+    "🔧 Select Manufacturer",
+    options=sorted(df['Manufacturer'].unique())
+)
 
-    st.markdown("---")
-    st.markdown(
-        "<div style='text-align: center; font-size: 13px; color: gray;'>"
-        "© 2025, <b>Khayaz</b>"
-        "</div>",
-        unsafe_allow_html=True
+available_models = df[df['Manufacturer'] == selected_manufacturer]['Model'].unique()
+selected_model = st.selectbox("🚗 Select Model", options=sorted(available_models))
+filtered_df = df[
+    (df['Manufacturer'] == selected_manufacturer) & 
+    (df['Model'] == selected_model)
+]
+
+
+st.markdown("---")
+st.markdown(
+    "<div style='text-align: center; font-size: 13px; color: gray;'>"
+    "© 2025, <b>Khayaz</b>"
+    "</div>",
+    unsafe_allow_html=True
     )
 
 # --- Filtered Data ---
