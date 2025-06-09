@@ -426,7 +426,7 @@ with tab5:
 
 # --- 6. Prepared Dataset Table ---
 st.header("Cleaned Data")
-if st.checkbox("Show Cleaned Data Table"):
+if st.checkbox("Hide Cleaned Data Table"):
     st.dataframe(
         filtered_df.style.format({
             'Sales in Thousands': '{:,.3f}',
@@ -450,5 +450,5 @@ if st.checkbox("Show Cleaned Data Table"):
             'Wheelbase-to-Length Ratio': '{:.3f}',
             'Area Proxy': '{:.1f}'
         }),
-        use_container_width=True
+        use_container_width=False
     )
