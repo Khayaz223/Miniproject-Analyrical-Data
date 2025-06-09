@@ -65,8 +65,6 @@ h1, h2, .stMetric, .stPlotlyChart {
 
 # --- Sidebar Filters ---
 with st.sidebar:
-    st.image("KYZ.png", use_container_width=True)  # Insert your image
-
     st.markdown("### 🔍 Filter Cars")
     
     with st.expander("🔧 Select Manufacturer(s)", expanded=False):
@@ -85,6 +83,8 @@ with st.sidebar:
         
         start_date = st.date_input("Start date", min_date)
         end_date = st.date_input("End date", max_date)
+
+    st.image("KYZ.png", use_container_width=True)  # Insert your image
 
     st.markdown("---")
     st.markdown(
