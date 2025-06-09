@@ -68,7 +68,7 @@ st.markdown(
     <style>
     .stApp {
         background-color: #1a1a1a;
-        color: #ffffff;
+        color: #8B4000;
     }
     .st-bb, .st-at, .st-ae, .st-af, .st-ag, .st-ah, .st-ai, .st-aj, .st-ak, .st-al, .st-am, .st-an, .st-ao, .st-ap, .st-aq, .st-ar, .st-as {
         background-color: #2d2d2d;
