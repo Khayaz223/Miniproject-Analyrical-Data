@@ -187,7 +187,7 @@ with col3:
     st.metric("Avg Resale Ratio", f"{resale_ratio}%", "Resale/Price Ratio")
 
 # Create tabs for different visualizations
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊 Sales by Manufacturer", 
     "⚖️ Weight & Specs", 
     "📈 Weekly Trend", 
