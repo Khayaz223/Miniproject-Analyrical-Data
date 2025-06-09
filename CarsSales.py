@@ -450,5 +450,5 @@ if st.checkbox("Hide Cleaned Data Table"):
             'Wheelbase-to-Length Ratio': '{:.3f}',
             'Area Proxy': '{:.1f}'
         }),
-        use_container_width=False
+        use_container_width=True
     )
